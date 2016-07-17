@@ -16,15 +16,24 @@
           </header>
       </div>
       <div class="main-container">
-        <div class="form-container inline-flex">
-          <form class="text-input" id="text-form" action="">
-            <textarea placeholder="Give Input"></textarea>
-            <button> Initiate from text input</button>
-            <input type="file" id="fileInput"> Upload File </button>
-          </form>
+        <div class="form-container">
+          <div class="action-container">
+            <textarea id="textInput" placeholder="Give Input"></textarea>
+            <button id="parseInputButton"> Initiate from text input</button>
+          </div>
+          <div class="action-container">
+            <label>Upload File: &nbsp;
+              <input type="file" id="fileInput">
+              <button id='upload-btn'>Upload</button>
+            </label>
+          </div>
         </div>
 
-        <div id="grid-container" class="grid clearfix"></div>
+        <div class="charts-container flex">
+          <div class="chart" id="barChart"></div>
+          <div class="chart" id="pieChart"></div>
+          <div class="chart" id="similarWordsChart"></div>
+        </div>
 
       </div>
       
