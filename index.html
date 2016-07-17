@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Text File Parer</title>
+        <meta charset="utf-8">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,300' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="css/normalize.min.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+      <div class="header-container">
+          <header>
+              <h1 class="title">Text file parser</h1>
+          </header>
+      </div>
+      <div class="main-container">
+        <div class="form-container inline-flex">
+          <form class="text-input" id="text-form" action="">
+            <textarea placeholder="Give Input"></textarea>
+            <button> Initiate from text input</button>
+            <input type="file" id="fileInput"> Upload File </button>
+          </form>
+        </div>
+
+        <div id="grid-container" class="grid clearfix"></div>
+
+      </div>
+      
+      <script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
+      <script src="https://d3js.org/d3.v4.min.js"></script>
+      <script src="js/main.js"></script>
+    </body>
+</html>
