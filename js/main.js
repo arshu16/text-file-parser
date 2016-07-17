@@ -247,19 +247,38 @@ function createBarGraph(data) {
   y.domain(data.map(function(d) { return d.word; }));
   x.domain([0, d3.max(data, function(d) {return d.frequency; })]);
 
-  g.selectAll(".bar")
+  var bar = g.selectAll(".bar")
       .data(data)
-      .enter().append("rect")
+      .enter().append('g')
+      .attr("cx",0)
+      .attr("transform", function(d, i) {
+        return "translate(" + 0 + "," + y(d.word) + ")";
+      });
+
+  bar.append("rect")
       .attr("class", "bar")
-      .attr("y", function(d) {return y(d.word); })
+      .attr("y", function(d) {return 0; })
       .attr("height", y.bandwidth())
       .attr("x", function(d) { return 0; })
-      .attr("width", function(d) { return x(d.frequency); })
-      .text(function(d) { return d.frequency; });
+      .attr("width", function(d) { return x(d.frequency); });
+
+  bar.append("text")
+      .attr("class", "value")
+      .attr("y", y.bandwidth() / 2)
+      .attr("dy", ".35em") //vertical align middle
+      .attr("text-anchor", "end")
+      .attr('fill', '#FFF')
+      .text(function(d){
+          return (d.frequency);
+      })
+      .attr("x", function(d){
+          var width = this.getBBox().width;
+          return Math.max(width + padding, x(d.frequency) - padding);
+      });
 
 
-  svg .attr("width", document.getElementById("barGroup").getBBox().width + 12 * padding)
-      .attr("height", document.getElementById("barGroup").getBBox().height + 12 * padding + 100);
+  svg.attr("width", document.getElementById("barGroup").getBBox().width + 12 * padding)
+    .attr("height", document.getElementById("barGroup").getBBox().height + 12 * padding + 100);
   svg.append("g")
       .attr("class", "x axis")
       .call(xAxis);
