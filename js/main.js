@@ -215,16 +215,45 @@ function parseText(text) {
   showChartsContainer();
   var words = text.split(/\s+/);
   var frequencyArray = countFrequency(words);
-  // var similarWordsObject = countSimilarWords(words);
   createBarGraph(frequencyArray);
   createPieChart(getPopularWords(frequencyArray));
-  // createSimilarWordsChart(similarWordsObject);
+  createSimilarWordsChart(countSimilarWords(frequencyArray));
 }
 
 function getPopularWords(frequencyArray) {
   return frequencyArray.filter(function(datum){
     return datum.frequency > 2;
   });
+}
+
+function getSimilarWord(word) {
+  var toBeReturned;
+  for(var i = 0; i < similarWords.length; i++) {
+    if(similarWords[i].indexOf(word) > -1) {
+      toBeReturned = similarWords[i];
+      break;
+    }
+  }
+  return toBeReturned;
+}
+
+function countSimilarWords(data) {
+  var toBeReturned = {};
+  for(var i = 0; i < data.length; i++) {
+    var similarArray = getSimilarWord(data[i]);
+    if(!similarArray) {
+      continue;
+    }
+    if(!toBeReturned[similarArray[0]]) {
+      toBeReturned[similarArray[0]]  = {
+        array: similarArray,
+        frequency: 1
+      }
+    } else {
+      toBeReturned[similarArray[0]].frequency += 1;
+    }
+  }
+  return toBeReturned;
 }
 
 function createBarGraph(data) {
