@@ -217,15 +217,21 @@ function parseText(text) {
   var frequencyArray = countFrequency(words);
   // var similarWordsObject = countSimilarWords(words);
   createBarGraph(frequencyArray);
-  createPieChart(frequencyArray);
+  createPieChart(getPopularWords(frequencyArray));
   // createSimilarWordsChart(similarWordsObject);
+}
+
+function getPopularWords(frequencyArray) {
+  return frequencyArray.filter(function(datum){
+    return datum.frequency > 2;
+  });
 }
 
 function createBarGraph(data) {
 
   var padding = 5,
       width = $('.chart').width() / 2, //5px padding left and right
-      height = $('.chart').height(); //200 - 5px padding top and bottom
+      height = $('.chart').height() - 2 * padding; //200 - 5px padding top and bottom
 
   var y = d3.scaleBand()
       .range([0, width])
@@ -300,7 +306,7 @@ function createPieChart(data) {
 
  var padding = 5,
     width = $('.chart').width() / 2, //5px padding left and right
-    height = $('.chart').height(); 
+    height = $('.chart').height() - 2 * padding; 
     radius = Math.min(width, height) / 2;
 
   var color = d3.scaleLinear()
