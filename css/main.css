@@ -76,7 +76,7 @@ input[type="file"] {
 }
 
 .main-container .charts-container .chart{
-  height: 200px;
+  height: 600px;
   padding: 5px;
   width: 100%;
   overflow: auto;

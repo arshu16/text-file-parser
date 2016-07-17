@@ -134,6 +134,7 @@ var ignore = ["a", "an", "and", "as", "be", "can", "for", "has", "he", "him", "h
 
 $(function() {
     attachEventListener();
+    hideChartsContainer();
 });
 
 
@@ -201,6 +202,11 @@ function showChartsContainer() {
   $('.charts-container').show();
 }
 
+function hideChartsContainer() {
+  $('.form-container').show();
+  $('.charts-container').hide();
+}
+
 
 function parseText(text) {
   if(!text) {
@@ -211,7 +217,7 @@ function parseText(text) {
   var frequencyArray = countFrequency(words);
   // var similarWordsObject = countSimilarWords(words);
   createBarGraph(frequencyArray);
-  // createPieChart(wordObject);
+  createPieChart(frequencyArray);
   // createSimilarWordsChart(similarWordsObject);
 }
 
@@ -219,7 +225,7 @@ function createBarGraph(data) {
 
   var padding = 5,
       width = $('.chart').width() / 2, //5px padding left and right
-      height = 140; //200 - 5px padding top and bottom
+      height = $('.chart').height(); //200 - 5px padding top and bottom
 
   var y = d3.scaleBand()
       .range([0, width])
@@ -236,9 +242,7 @@ function createBarGraph(data) {
       .scale(y)
       .ticks(10);
 
-  var svg = d3.select("#barChart").append("svg")
-      .attr("width", width)
-      .attr("height", height);
+  var svg = d3.select("#barChart").append("svg");
   var g = svg
           .append("g")
           .attr('id', 'barGroup')
@@ -257,6 +261,7 @@ function createBarGraph(data) {
 
   bar.append("rect")
       .attr("class", "bar")
+      .attr('fill', '#2E784B')
       .attr("y", function(d) {return 0; })
       .attr("height", y.bandwidth())
       .attr("x", function(d) { return 0; })
@@ -267,18 +272,19 @@ function createBarGraph(data) {
       .attr("y", y.bandwidth() / 2)
       .attr("dy", ".35em") //vertical align middle
       .attr("text-anchor", "end")
-      .attr('fill', '#FFF')
+      .attr('fill', '#000')
       .text(function(d){
           return (d.frequency);
       })
       .attr("x", function(d){
           var width = this.getBBox().width;
-          return Math.max(width + padding, x(d.frequency) - padding);
+          return Math.max(width + padding, x(d.frequency) + 2 * padding);
       });
 
 
-  svg.attr("width", document.getElementById("barGroup").getBBox().width + 12 * padding)
-    .attr("height", document.getElementById("barGroup").getBBox().height + 12 * padding + 100);
+  svg.attr("width", document.getElementById("barGroup").getBBox().width )
+    .attr("height", document.getElementById("barGroup").getBBox().height + 12 * padding);
+
   svg.append("g")
       .attr("class", "x axis")
       .call(xAxis);
@@ -288,6 +294,61 @@ function createBarGraph(data) {
       .attr("transform", "translate(0," + (document.getElementById("barGroup").getBBox().height + y.bandwidth()) +  ")")
       .call(yAxis);
 
+}
+
+function createPieChart(data) {
+
+ var padding = 5,
+    width = $('.chart').width() / 2, //5px padding left and right
+    height = $('.chart').height(); 
+    radius = Math.min(width, height) / 2;
+
+  var color = d3.scaleLinear()
+      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+  var arc = d3.arc()
+      .outerRadius(radius - 10)
+      .innerRadius(0);
+
+  var labelArc = d3.arc()
+      .outerRadius(radius - 40)
+      .innerRadius(radius - 40);
+
+  var pie = d3.pie()
+      .sort(null)
+      .value(function(d) { return d.frequency; });
+
+  var svg = d3.select("#pieChart").append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .append("g")
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+  var g = svg.selectAll(".arc")
+      .data(pie(data))
+      .enter().append("g")
+      .attr("class", "arc");
+
+  g.append("path")
+      .attr("d", arc)
+      .style("fill", function(d) { return color(d.data.frequency); });
+
+  g.append("text")
+      .attr("dy", ".35em")
+      .attr('fill', '#000')
+      .text(function(d) { return d.data.word; })
+      .attr("transform", function(d, i) {
+          var c = labelArc.centroid(d),
+              x = c[0],
+              y = c[1],
+              // pythagorean theorem for hypotenuse
+              h = Math.sqrt(x*x + y*y);
+              return "translate(" + ((x/h * radius) + padding) +  ',' + ((y/h * radius) + padding) +  ")"; 
+      })
+      .attr("text-anchor", function(d) {
+        return (d.endAngle + d.startAngle)/2 > Math.PI ? "end" : "start";
+      })
+      .attr('font-size', '9px');
 }
 
 
