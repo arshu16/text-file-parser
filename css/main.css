@@ -85,6 +85,37 @@ input[type="file"] {
 .main-container .charts-container .chart svg{
   overflow: visible;
 }
+
+.main-container .similar-words {
+  flex-direction: row;
+  flex-wrap: wrap;
+  background: #FFFFF5;
+  padding: 10px;
+  align-items: center;
+  align-content: center;
+  justify-content: space-around;
+}
+
+.main-container .similar-word-container{
+  margin: 10px;
+}
+
+.main-container .similar-word-container img {
+  width: 35px;
+  height: 35px;
+  border-radius: 500px;
+}
+
+.main-container .similar-word-container .similar-word-frequency {
+  display: block;
+  font-weight: bold;
+  font-size: 3.5rem;
+}
+
+.main-container .similar-word-container .similar-words-collection {
+  display: block;
+  text-transform: capitalize;
+}
 /* -------------- */
 
 

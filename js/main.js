@@ -2,9 +2,7 @@ var ignore = ["a", "an", "and", "as", "be", "can", "for", "has", "he", "him", "h
     similarWords = [
                     ["accept","acceptance","acceptable"],
                     ["achieve","achievement","achievable"],
-                    ["act","action","active","actively"],
-                    ["act","activity","active","actively"],
-                    ["act","activeness","active","actively"],
+                    ["act","action","active","actively", "activity", "activeness"],
                     ["add","addition","additional"],
                     ["adjust","adjustment","adjustable"], 
                     ["admire","admiration","admirable"],
@@ -129,7 +127,19 @@ var ignore = ["a", "an", "and", "as", "be", "can", "for", "has", "he", "him", "h
                     ["whiten","whiteness","white"],
                     ["badness","bad","badly"],
                     ["terror", "terrorist", "terrorism"]
-                  ];
+                  ],
+                  frequencyArray, similarWords;
+
+function addClass(el, className) { 
+  if (!el || el.className === null || hasClass(el, className)) {
+    return;
+  }
+  el.className += ' ' + className + ' ';
+}
+
+function hasClass(el, className) {
+    return el && el.className && el.className.contains(className);
+}
 
 
 $(function() {
@@ -144,6 +154,15 @@ function attachEventListener() {
     $('#fileInput').click();
   });
   $('#parseInputButton').on('click', readInput);
+  window.addEventListener('resize', handleResize);
+}
+
+var lastTimeout;
+function handleResize() {
+  if(lastTimeout) {
+    window.clearTimeout(lastTimeout);
+  }
+  lastTimeout = window.setTimeout(createGraphs, 250);
 }
 
 
@@ -214,10 +233,25 @@ function parseText(text) {
   }
   showChartsContainer();
   var words = text.split(/\s+/);
-  var frequencyArray = countFrequency(words);
+  frequencyArray = countFrequency(words),
+  similarWords = countSimilarWords(frequencyArray);
+  createGraphs();
+}
+
+function createGraphs() {
+  if(!frequencyArray || !similarWords) {
+    return;
+  }
+  clearHtml();
   createBarGraph(frequencyArray);
   createPieChart(getPopularWords(frequencyArray));
-  createSimilarWordsChart(countSimilarWords(frequencyArray));
+  createSimilarWordsChart(similarWords);
+}
+
+function clearHtml() {
+  document.getElementById('barChart').innerHTML = '';
+  document.getElementById('pieChart').innerHTML = '';
+  document.getElementById('similarWordsChart').innerHTML = '';
 }
 
 function getPopularWords(frequencyArray) {
@@ -240,14 +274,14 @@ function getSimilarWord(word) {
 function countSimilarWords(data) {
   var toBeReturned = {};
   for(var i = 0; i < data.length; i++) {
-    var similarArray = getSimilarWord(data[i]);
+    var similarArray = getSimilarWord(data[i].word);
     if(!similarArray) {
       continue;
     }
     if(!toBeReturned[similarArray[0]]) {
       toBeReturned[similarArray[0]]  = {
         array: similarArray,
-        frequency: 1
+        frequency: data[i].frequency
       }
     } else {
       toBeReturned[similarArray[0]].frequency += 1;
@@ -323,10 +357,10 @@ function createBarGraph(data) {
   svg.append("g")
       .attr("class", "x axis")
       .call(xAxis);
-
+  var xAxisBBox = document.querySelector("#barChart .x.axis").getBBox();
   svg.append("g")
       .attr("class", "y axis")
-      .attr("transform", "translate(0," + (document.getElementById("barGroup").getBBox().height + y.bandwidth()) +  ")")
+      .attr("transform", "translate(0," + (xAxisBBox.height + xAxisBBox.y) +  ")")
       .call(yAxis);
 
 }
@@ -338,8 +372,7 @@ function createPieChart(data) {
     height = $('.chart').height() - 2 * padding; 
     radius = Math.min(width, height) / 2;
 
-  var color = d3.scaleLinear()
-      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+  var color = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
 
   var arc = d3.arc()
       .outerRadius(radius - 10)
@@ -366,12 +399,12 @@ function createPieChart(data) {
 
   g.append("path")
       .attr("d", arc)
-      .style("fill", function(d) { return color(d.data.frequency); });
+      .style("fill", function(d) { return color[Math.floor(Math.random() * color.length)]; });
 
   g.append("text")
       .attr("dy", ".35em")
       .attr('fill', '#000')
-      .text(function(d) { return d.data.word; })
+      .text(function(d) { return d.data.word + '(' + d.data.frequency + ')'; })
       .attr("transform", function(d, i) {
           var c = labelArc.centroid(d),
               x = c[0],
@@ -384,6 +417,36 @@ function createPieChart(data) {
         return (d.endAngle + d.startAngle)/2 > Math.PI ? "end" : "start";
       })
       .attr('font-size', '9px');
+}
+
+function createElement(type) {
+  return document.createElement(type);
+}
+
+function createSimilarWordsChart(data) {
+  if(!data || !Object.keys(data).length) {
+    return;
+  }
+  var keys = Object.keys(data);
+  var mainContainer = createElement('div');
+  addClass(mainContainer, 'similar-words flex');
+  keys.forEach(function(key){
+    var container = createElement('div');
+    addClass(container, 'similar-word-container');
+    var img = createElement('img');
+    img.src = 'assets/images/' + key + '.png';
+    container.appendChild(img);
+    var frequencyText = createElement('span');
+    addClass(frequencyText, 'similar-word-frequency');
+    frequencyText.innerHTML = data[key].frequency;
+    container.appendChild(frequencyText);
+    var similarWordsArray = createElement('span');
+    addClass(similarWordsArray, 'similar-words-collection');
+    similarWordsArray.innerHTML = data[key].array.join('/');
+    container.appendChild(similarWordsArray);
+    mainContainer.appendChild(container);
+  });
+  document.getElementById('similarWordsChart').appendChild(mainContainer);
 }
 
 
